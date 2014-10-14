@@ -1,15 +1,20 @@
-angular.module('starter.controllers', [])
-
-.controller('DashCtrl', function($scope) {
+angular.module('dialer.controllers', []).controller('ContactCtrl', function($scope, Contacts) {
+    var contact = {
+        id: 1001,
+        name: {
+            givenName: 'Dexter',
+            familyName: 'Morgan'
+        },
+        displayName: name.givenName + ' ' + name.familyName,
+        nickname: name.givenName,
+        phoneNumbers: []
+    };
+    Contacts.save(contact);
+    $scope.contacts = Contacts.all();
+    console.log($scope.contacts);
 })
-
-.controller('FriendsCtrl', function($scope, Friends) {
-  $scope.friends = Friends.all();
+.controller('ContactDetailCtrl', function($scope, $stateParams, Contacts) {
+    $scope.contact = Contacts.get($stateParams.contactId);
 })
-
-.controller('FriendDetailCtrl', function($scope, $stateParams, Friends) {
-  $scope.friend = Friends.get($stateParams.friendId);
-})
-
-.controller('AccountCtrl', function($scope) {
-});
+.controller('AccountCtrl', function($scope) {})
+.controller('AboutCtrl', function($scope) {});

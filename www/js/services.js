@@ -1,26 +1,36 @@
-angular.module('starter.services', [])
-
+angular.module('dialer.services', ['ngCordovaMocks'])
 /**
  * A simple example service that returns some data.
  */
-.factory('Friends', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var friends = [
-    { id: 0, name: 'Scruff McGruff' },
-    { id: 1, name: 'G.I. Joe' },
-    { id: 2, name: 'Miss Frizzle' },
-    { id: 3, name: 'Ash Ketchum' }
-  ];
-
-  return {
-    all: function() {
-      return friends;
-    },
-    get: function(friendId) {
-      // Simple index lookup
-      return friends[friendId];
+.factory('Contacts', function($cordovaContacts) {
+    // Might use a resource here that returns a JSON array
+    // Some fake testing data
+    var contacts = [];
+    return {
+        all: function() {
+            var options = {};
+            options.filter = "";
+            options.multiple = true;
+            $cordovaContacts.find(options).then(function(result) {
+                contacts = result;
+            }, function(err) {
+                console.log(err);
+            })
+            return contacts;
+        },
+        get: function(filterKeyword) {
+            var options = {};
+            options.filter = filterKeyword;
+            options.multiple = true;
+            $cordovaContacts.find(options).then(function(result) {
+                contacts = result;
+            }, function(err) {
+                console.log(err);
+            })
+            return contacts;
+        },
+        save: function(contact) {
+            $cordovaContacts.save(contact);
+        }
     }
-  }
 });
