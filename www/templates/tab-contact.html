@@ -1,5 +1,27 @@
 <ion-view title="Contacts">
-  <ion-content class="padding">
-    <h1>Contacts</h1>
-  </ion-content>
+    <ion-content class="padding">
+        <div class="list list-inset">
+            <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Search" ng-model="searchKeyword" ng-change="searchContact(searchKeyword)">
+            </label>
+        </div>
+        <ion-list>
+            <ion-item ng-repeat="contact in contacts">
+                <div class="card">
+                    <div class="item item-divider">
+                        {{contact.displayName}}
+                    </div>
+                    <div class="item item-body">
+                        <div ng-repeat="phone in contact.phoneNumbers">
+                            <i class="icon ion-ios7-telephone"></i>
+                            {{phone.value}}
+                            <button class="button button-small button-balanced icon-left ion-ios7-telephone"  style="float:right;" ng-click="call(phone.value)">Call</button>
+                        </div>
+                    </div>
+                </div>
+            </ion-item>
+        </ion-list>
+    </ion-content>
 </ion-view>
+

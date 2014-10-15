@@ -293,7 +293,12 @@ ngCordovaMocks.factory('$cordovaContacts', ['$q', function($q) {
 						var results = [];
 						for (var i=0; i<this.contacts.length; i++) {
 							for(var key in this.contacts[i]) {
-								var propertyValue = this.contacts[i][key];
+								var propertyValue = '' + this.contacts[i][key];
+                                if (propertyValue && propertyValue.match('/'+options.filter+'/gi'))
+                                    {
+                                        result.push(this.contacts[i]);
+                                        break;
+                                    }
 							}
 						}
 						// TODO: Search by individual fields

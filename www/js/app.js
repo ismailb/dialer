@@ -37,14 +37,6 @@ angular.module('dialer', ['ionic', 'dialer.controllers', 'dialer.services', 'ngC
                 controller: 'ContactCtrl'
             }
         }
-    }).state('tab.contact-detail', {
-        url: '/contact/:contactId',
-        views: {
-            'tab-contact-detail': {
-                templateUrl: 'templates/contact-detail.html',
-                controller: 'ContactDetailCtrl'
-            }
-        }
     }).state('tab.account', {
         url: '/account',
         views: {
