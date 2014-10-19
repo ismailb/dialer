@@ -1,4 +1,4 @@
-angular.module('dialer.services', ['ngCordovaMocks'])
+angular.module('dialer.services', ['ngCordova'])
 /**
  * A simple example service that returns some data.
  */
@@ -6,7 +6,7 @@ angular.module('dialer.services', ['ngCordovaMocks'])
     return {
         all: function() {
             var options = {};
-            options.fields = '*';
+            //options.fields = '*';
             options.filter = "";
             options.multiple = true;
             var defer = $q.defer();
@@ -19,7 +19,7 @@ angular.module('dialer.services', ['ngCordovaMocks'])
         },
         get: function(filterKeyword, field) {
             var options = {};
-            options.fields = filterKeyword ? (field ? field : 'displayName') : '*';
+            //options.fields = filterKeyword ? (field ? field : 'displayName') : '*';
             options.filter = filterKeyword;
             options.multiple = true;
             var defer = $q.defer();
@@ -39,7 +39,7 @@ angular.module('dialer.services', ['ngCordovaMocks'])
         }
     }
 })
-.factory('Localstorage', ['$window',
+.factory('LocalStorage', ['$window',
     function($window) {
         return {
             set: function(key, value) {

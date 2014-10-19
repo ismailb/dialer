@@ -31,7 +31,7 @@ angular.module('dialer.controllers', []).controller('ContactCtrl', function($sco
         Contacts.save(contact1);
         Contacts.save(contact2);
     }
-    setupData();
+    //setupData();
     Contacts.all().then(function(result) {
         $scope.contacts = result;
         console.log($scope.contacts);
