@@ -3,14 +3,14 @@
         <div class="list list-inset">
             <label class="item item-input">
                 <i class="icon ion-search placeholder-icon"></i>
-                <input type="text" placeholder="Search" ng-model="searchKeyword" ng-change="searchContact(searchKeyword)">
+                    <input type="text" placeholder="Search" ng-model="search.keyword" ng-change="searchContact(search.keyword)">
             </label>
         </div>
         <ion-list>
             <ion-item ng-repeat="contact in contacts">
                 <div class="card">
                     <div class="item item-divider">
-                        {{contact.displayName}}
+                        {{contact.name.formatted}}
                     </div>
                     <div class="item item-body">
                         <div ng-repeat="phone in contact.phoneNumbers">

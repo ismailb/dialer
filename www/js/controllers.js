@@ -38,7 +38,7 @@ angular.module('dialer.controllers', []).controller('ContactCtrl', function($sco
     }, function(e) {
         console.log(e)
     });
-    $scope.searchKeyword = '';
+    $scope.search = { keyword : ''};
     $scope.searchContact = function(key) {
         Contacts.get.call(this, key).then(function(result) {
             $scope.contacts = result;
@@ -46,9 +46,6 @@ angular.module('dialer.controllers', []).controller('ContactCtrl', function($sco
         }, function(e) {
             console.log(e)
         });
-    };
-    $scope.goToContactDetail = function(id) {
-        $state.go('tab.contactdetail');
     };
     $scope.call = function(phoneNumber) {
         console.log('call ' + phoneNumber);

@@ -6,26 +6,32 @@ angular.module('dialer.services', ['ngCordova'])
     return {
         all: function() {
             var options = {};
-            //options.fields = '*';
+            options.fields = ['*'];
             options.filter = "";
             options.multiple = true;
             var defer = $q.defer();
             $cordovaContacts.find(options).then(function(result) {
+                console.log('service:result get all');
+                console.log(result);                
                 defer.resolve(result);
             }, function(err) {
+                console.log(err);
                 defer.reject(err);
             })
             return defer.promise;
         },
-        get: function(filterKeyword, field) {
+        get: function(filterKeyword) {
             var options = {};
-            //options.fields = filterKeyword ? (field ? field : 'displayName') : '*';
+            options.fields = ['*'];
             options.filter = filterKeyword;
             options.multiple = true;
             var defer = $q.defer();
             $cordovaContacts.find(options).then(function(result) {
+                console.log('service:result get');
+                console.log(result);
                 defer.resolve(result);
             }, function(err) {
+                console.log(err);
                 defer.reject(err);
             })
             return defer.promise;
