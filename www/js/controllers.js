@@ -1,4 +1,4 @@
-angular.module('dialer.controllers', []).controller('ContactCtrl', function($scope, Contacts, LocalStorage) {
+angular.module('dialer.controllers', []).controller('ContactCtrl', function($scope, $state, $ionicPlatform, Contacts, LocalStorage) {
     function setupData() {
         var contact1 = {
             id: 1001,
@@ -32,13 +32,22 @@ angular.module('dialer.controllers', []).controller('ContactCtrl', function($sco
         Contacts.save(contact2);
     }
     //setupData();
-    Contacts.all().then(function(result) {
-        $scope.contacts = result;
-        console.log($scope.contacts);
-    }, function(e) {
-        console.log(e)
+    console.log('navigator.contacts');
+    console.log(navigator.contacts);
+    $ionicPlatform.ready(function() {
+        console.log('navigator.contacts 2');
+        console.log(navigator.contacts);
+        Contacts.all().then(function(result) {
+            $scope.contacts = result;
+            console.log($scope.contacts);
+        }, function(e) {
+            console.log(e)
+        });
     });
-    $scope.search = { keyword : ''};
+
+    $scope.search = {
+        keyword: ''
+    };
     $scope.searchContact = function(key) {
         Contacts.get.call(this, key).then(function(result) {
             $scope.contacts = result;
@@ -54,9 +63,14 @@ angular.module('dialer.controllers', []).controller('ContactCtrl', function($sco
         if (settings && settings.tollNumber && settings.authCode) {
             var callPrefix = "tel:" + settings.tollNumber + ',9,' + settings.authCode + '#,,,,,,';
             // TODO: strip + sign and take the , ; #s from the client
-            document.location.href = callPrefix + phoneNumber;
+            var callTo = callPrefix + phoneNumber;
+            console.log(callTo);
+            document.location.href = callTo;
+            //window.open(callTo);
         } else {
             console.log('Configure settings first!!!');
+            alert('Feed in your voip details in account first!');
+            $state.go('tab.account');
         }
     };
 }).controller('AccountCtrl', function($scope, LocalStorage) {

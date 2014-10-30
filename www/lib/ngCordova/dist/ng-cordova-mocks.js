@@ -1,5 +1,6 @@
 /*!
  * ngCordova
+ * v0.1.4-alpha
  * Copyright 2014 Drifty Co. http://drifty.com/
  * See LICENSE in this repository for license information
  */
@@ -293,12 +294,7 @@ ngCordovaMocks.factory('$cordovaContacts', ['$q', function($q) {
 						var results = [];
 						for (var i=0; i<this.contacts.length; i++) {
 							for(var key in this.contacts[i]) {
-								var propertyValue = '' + this.contacts[i][key];
-                                if (propertyValue && propertyValue.match('/'+options.filter+'/gi'))
-                                    {
-                                        result.push(this.contacts[i]);
-                                        break;
-                                    }
+								var propertyValue = this.contacts[i][key];
 							}
 						}
 						// TODO: Search by individual fields
@@ -715,7 +711,7 @@ ngCordovaMocks.factory('$cordovaDeviceOrientation', ['$interval', '$q', function
  * A service for testing dialogs
  * in an app build with ngCordova.
  */ 
-ngCordovaMocks.factory('$cordovaDialogs', function() {
+ngCordovaMocks.factory('$cordovaDialogs', ['$q', function ($q) {
 	var dialogText = false;
 	var dialogTitle = '';
 	var defaultValue = '';
@@ -802,34 +798,47 @@ ngCordovaMocks.factory('$cordovaDialogs', function() {
 		**/
 		useHostAbilities: useHostAbilities,		
 
-		alert: function(message, callback, title, buttonName) {
+		alert: function(message, title, buttonName) {
+			var d = $q.defer();
+
 			if (this.useHostAbilities) {
 				// NOTE: The window.alert method doesn't support a title or callbacks.				
 				alert(message);
+				d.resolve();
 			} else {
 				this.dialogText = message;
 				this.dialogTitle = title;
 				this.buttonLabels.push(buttonName);				
+				d.resolve();
 			}
+			
+			return d.promise;
 		},
 
-		confirm: function(message, callback, title, buttonName) {
+		confirm: function(message, title, buttonName) {
+			var d = $q.defer();
+
 			if (this.useHostAbilities) {
 				// NOTE: The window.confirm method doesn't support a title or custom button naming.
 				var result = confirm(message);
-				callback(result);
+				d.resolve(result ? 2 : 1);
 			} else {
 				this.dialogText = message;
 				this.dialogTitle = title;
 				this.buttonLabels.push(buttonName);				
+				d.resolve(0);
 			}
+
+			return d.promise;
 		},
 
-		prompt: function(message, promptCallback, title, buttonLabels, defaultText) {
+		prompt: function(message, title, buttonLabels, defaultText) {
+			var d = $q.defer();
+
 			if (this.useHostAbilities) {
 				// NOTE: The window.prompt method doesn't support a title or custom button naming.
 				var result = prompt(message, defaultText);
-				promptCallback(result);				
+				d.resolve(result);
 			} else {
 				this.dialogText = message;
 				this.dialogTitle = title;
@@ -839,17 +848,17 @@ ngCordovaMocks.factory('$cordovaDialogs', function() {
 					this.buttonLabels.push(buttonLabels[i]);
 				}
 
-				if (promptCallback) {
-					promptCallback(this.promptResponse);
-				}
+				d.resolve(this.promptResponse);
 			}
+
+			return d.promise;
 		},
 
 		beep: function(times) {
 			this.beepCount = times;
 		}
 	};
-});
+}]);
 /**
  * @ngdoc service
  * @name ngCordovaMocks.cordovaFile
@@ -857,13 +866,23 @@ ngCordovaMocks.factory('$cordovaDialogs', function() {
  * @description
  * A service for testing interaction with device directories and files
  * in an app build with ngCordova.
- */ 
+ */
 ngCordovaMocks.factory('$cordovaFile', ['$q', function($q) {
 	var throwsError = false;
 	var fileSystem = {};
 
+	var mockIt = function(errorMessage) {
+		var defer = $q.defer();
+		if (this.throwsError) {
+			defer.reject(errorMessage);
+		} else {
+			defer.resolve();
+		}
+		return defer.promise;
+	};
+
 	return {
-        /**
+    /**
 		 * @ngdoc property
 		 * @name throwsError
 		 * @propertyOf ngCordovaMocks.cordovaFile
@@ -871,10 +890,10 @@ ngCordovaMocks.factory('$cordovaFile', ['$q', function($q) {
 		 * @description
 		 * A flag that signals whether a promise should be rejected or not.
 		 * This property should only be used in automated tests.
-		**/
+		 **/
 		throwsError: throwsError,
 
-        /**
+    /**
 		 * @ngdoc property
 		 * @name fileSystem
 		 * @propertyOf ngCordovaMocks.cordovaFile
@@ -882,97 +901,75 @@ ngCordovaMocks.factory('$cordovaFile', ['$q', function($q) {
 		 * @description
 		 * A fake, in-memory file system. This is incomplete at this time.
 		 * This property should only be used in automated tests.
-		**/		
+		 **/		
 		fileSystem: fileSystem,
 
 		checkDir: function(directory) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error checking the directory.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error checking the directory.');		
 		},
 
 		createDir: function(directory, overwrite) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error creating the directory.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error creating the directory.');		
+		},
+
+		listDir: function(filePath) {
+		 	return mockIt.call(this, 'There was an error listing the directory');
 		},
 
 		checkFile: function(directory, file) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error checking for the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error checking for the file.');	
 		},
 
 		createFile: function(directory, file, overwrite) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error creating the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error creating the file.');
 		},
 
 		removeFile: function(directory, file) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error removng the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this,'There was an error removng the file.');	
 		},
 
-		writeFile: function(directory, file) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error writing the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+		writeFile: function(directory, file, options) {
+			return mockIt.call(this,'There was an error writing the file.');		
 		},
 
 		readFile: function(directory, file) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error reading the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error reading the file.');			
+		},
+
+		readAsText: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file as text.');
+		},
+
+		readAsDataURL: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file as a data url.');
+		},
+
+		readAsBinaryString: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file as a binary string.');
+		},
+
+		readAsArrayBuffer: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file as an array buffer.');
+		},
+
+		readFileMetadata: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file metadata');
+		},
+
+		readFileAbsolute: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file from the absolute path');
+		},
+
+		readFileMetadataAbsolute: function (filePath) {
+			return mockIt.call(this, 'There was an error reading the file metadta from the absolute path');
 		},
 
 		downloadFile: function(source, filePath, trust, options) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error downloading the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error downloading the file.');	
 		},
 
 		uploadFile: function(server, filePath, options) {
-			var defer = $q.defer();
-			if (this.throwsError) {
-				defer.reject('There was an error uploading the file.');
-			} else {
-				defer.resolve();
-			}
-			return defer.promise;			
+			return mockIt.call(this, 'There was an error uploading the file.');	
 		}		
 	};
 }]);
